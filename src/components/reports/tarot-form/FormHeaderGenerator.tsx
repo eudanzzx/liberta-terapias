@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 
 export const generateFormHeader = (doc: jsPDF, clientName: string) => {
   const pageWidth = doc.internal.pageSize.width;

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { DollarSign, TrendingUp, Calendar, Users, Download } from 'lucide-react';
 import useUserDataService from "@/services/userDataService";
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 import { toast } from 'sonner';
 
 const RelatoriosFinanceirosTarot = () => {

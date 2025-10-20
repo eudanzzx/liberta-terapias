@@ -3,8 +3,15 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
 import { toast } from 'sonner';
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+    getNumberOfPages: () => number;
+  }
+}
 
 interface GeneralReportGeneratorProps {
   atendimentos: any[];
@@ -110,7 +117,7 @@ const GeneralReportGenerator: React.FC<GeneralReportGeneratorProps> = ({ atendim
       });
       
       // Footer
-      const totalPages = doc.getNumberOfPages();
+      const totalPages = (doc as any).getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         doc.setFontSize(8);

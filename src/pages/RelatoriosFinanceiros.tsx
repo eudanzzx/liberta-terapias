@@ -11,7 +11,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 
 const RelatoriosFinanceiros = () => {
   const { getAtendimentos } = useUserDataService();

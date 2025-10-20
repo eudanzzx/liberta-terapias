@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 

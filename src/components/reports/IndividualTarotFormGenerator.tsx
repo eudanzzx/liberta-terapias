@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
 import { toast } from 'sonner';
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 import { format } from 'date-fns';
 import { generateFormHeader } from './tarot-form/FormHeaderGenerator';
 import { generateClientInfo } from './tarot-form/ClientInfoGenerator';

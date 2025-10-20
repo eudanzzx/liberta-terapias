@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 
 export const generatePlanData = (doc: jsPDF, analise: any, yPos: number) => {
   const margin = 20;

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Download, Sparkles } from "lucide-react";
 import useUserDataService from "@/services/userDataService";
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import DashboardHeader from "@/components/dashboard/DashboardHeader";

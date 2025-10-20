@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import ReportManager from "@/components/ReportManager";
 import BirthdayNotifications from "@/components/BirthdayNotifications";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { jsPDF } from 'jspdf';
+import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 declare module 'jspdf' {
@@ -166,7 +166,7 @@ const RelatorioGeral = () => {
         yPos += 5;
       });
       
-      const totalPages = doc.getNumberOfPages();
+      const totalPages = (doc as any).getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         doc.setFontSize(10);
