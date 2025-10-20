@@ -14,7 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      atendimentos: {
+        Row: {
+          cliente_nome: string
+          created_at: string
+          data: string
+          id: string
+          observacoes: string | null
+          tipo: string
+          updated_at: string
+          user_id: string
+          valor: number | null
+        }
+        Insert: {
+          cliente_nome: string
+          created_at?: string
+          data: string
+          id?: string
+          observacoes?: string | null
+          tipo: string
+          updated_at?: string
+          user_id: string
+          valor?: number | null
+        }
+        Update: {
+          cliente_nome?: string
+          created_at?: string
+          data?: string
+          id?: string
+          observacoes?: string | null
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atendimentos_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
