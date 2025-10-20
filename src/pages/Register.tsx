@@ -1,85 +1,75 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import Logo from '@/components/Logo';
 
 const Register = () => {
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !username || !password || !confirmPassword) {
-      toast({
-        variant: 'destructive',
-        title: 'Campos obrigatórios',
-        description: 'Por favor, preencha todos os campos.'
-      });
+    if (!email || !password || !confirmPassword) {
+      toast.error('Por favor, preencha todos os campos.');
       return;
     }
     
     if (password !== confirmPassword) {
-      toast({
-        variant: 'destructive',
-        title: 'Senhas não conferem',
-        description: 'As senhas digitadas não são iguais.'
-      });
+      toast.error('As senhas digitadas não são iguais.');
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error('A senha deve ter pelo menos 6 caracteres.');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      const success = await register(username, email, password);
+      const { error } = await register(email, password);
       
-      if (success) {
-        toast({
-          title: 'Conta criada com sucesso',
-          description: 'Bem-vindo ao sistema Libertá!'
-        });
-        navigate('/');
+      if (error) {
+        toast.error(error.message || 'Erro ao criar conta.');
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Falha no cadastro',
-          description: 'Este email já está em uso.'
-        });
+        toast.success('Conta criada! Verifique seu email para confirmar.');
+        navigate('/login');
       }
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro',
-        description: 'Ocorreu um erro ao criar sua conta.'
-      });
+      toast.error('Ocorreu um erro ao criar sua conta.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
-      <Card className="w-full max-w-md border-blue-100 shadow-lg animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-main-primary-light/10 to-main-primary/5 p-4">
+      <Card className="w-full max-w-md shadow-xl border-border/50">
         <CardHeader className="text-center space-y-2">
           <div className="flex justify-center mb-2">
             <Logo height={80} width={80} />
           </div>
-          <CardTitle className="text-2xl font-bold text-[#0EA5E9]">
-            Crie sua conta Libertá
+          <CardTitle className="text-2xl font-bold main-primary">
+            Criar conta
           </CardTitle>
-          <p className="text-gray-500">Preencha os dados para se registrar</p>
+          <p className="text-muted-foreground">Preencha os dados para se registrar</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -92,19 +82,7 @@ const Register = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="border-blue-100"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="username">Nome de usuário</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Seu nome"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={isLoading}
-                className="border-blue-100"
+                required
               />
             </div>
             <div className="space-y-2">
@@ -112,11 +90,11 @@ const Register = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="********"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="border-blue-100"
+                required
               />
             </div>
             <div className="space-y-2">
@@ -124,16 +102,16 @@ const Register = () => {
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="********"
+                placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={isLoading}
-                className="border-blue-100"
+                required
               />
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-[#0EA5E9] hover:bg-[#0284C7]" 
+              className="w-full bg-main-primary hover:bg-main-primary-dark" 
               disabled={isLoading}
             >
               {isLoading ? "Cadastrando..." : "Cadastrar"}
@@ -141,9 +119,9 @@ const Register = () => {
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Já tem uma conta?{" "}
-            <Link to="/login" className="text-[#0EA5E9] hover:underline">
+            <Link to="/login" className="main-primary hover:underline font-medium">
               Entrar
             </Link>
           </p>

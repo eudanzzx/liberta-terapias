@@ -13,29 +13,27 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { UserIcon, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const UserMenu = () => {
-  const { currentUser, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     toast({
       title: 'Logout realizado',
-      description: 'Você saiu do sistema com sucesso.'
+      description: 'Você foi desconectado com sucesso.'
     });
+    navigate('/login');
   };
 
-  if (!currentUser) return null;
+  if (!user) return null;
 
   const getInitials = () => {
-    if (!currentUser.name) return 'U';
-    return currentUser.name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
+    if (!user.email) return 'U';
+    return user.email.charAt(0).toUpperCase();
   };
 
   return (
@@ -53,15 +51,11 @@ const UserMenu = () => {
         align="end" 
         className="w-48 bg-black/90 border border-white/20 backdrop-blur-md"
       >
-        <DropdownMenuLabel className="text-white">Minha Conta</DropdownMenuLabel>
-        <DropdownMenuSeparator className="border-white/20" />
-        <DropdownMenuItem disabled className="flex justify-between text-white/80">
-          <span className="text-sm">{currentUser.name}</span>
-          <UserIcon className="h-4 w-4" />
-        </DropdownMenuItem>
-        <DropdownMenuItem disabled className="text-xs text-white/60">
-          {currentUser.email}
-        </DropdownMenuItem>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{user.email}</p>
+          </div>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator className="border-white/20" />
         <DropdownMenuItem 
           onClick={handleLogout} 

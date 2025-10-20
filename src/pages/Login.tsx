@@ -1,114 +1,94 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import Logo from '@/components/Logo';
-import { Checkbox } from "@/components/ui/checkbox";
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
-      toast({
-        variant: 'destructive',
-        title: 'Campos obrigatórios',
-        description: 'Por favor, preencha todos os campos.'
-      });
+      toast.error('Por favor, preencha todos os campos.');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      const success = await login(email, password, rememberMe);
+      const { error } = await login(email, password);
       
-      if (success) {
-        toast({
-          title: 'Login bem-sucedido',
-          description: 'Bem-vindo de volta!'
-        });
-        navigate('/');
+      if (error) {
+        toast.error(error.message || 'Email ou senha incorretos.');
       } else {
-        toast({
-          variant: 'destructive',
-          title: 'Falha no login',
-          description: 'Email ou senha incorretos.'
-        });
+        toast.success('Login bem-sucedido!');
+        navigate('/');
       }
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro',
-        description: 'Ocorreu um erro ao fazer login.'
-      });
+      toast.error('Ocorreu um erro ao fazer login.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F1F7FF] p-4">
-      <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-main-primary-light/10 to-main-primary/5 p-4">
+      <Card className="w-full max-w-md shadow-xl border-border/50">
         <CardHeader className="text-center space-y-2">
           <div className="flex justify-center mb-2">
             <Logo height={80} width={80} />
           </div>
-          <CardTitle className="text-2xl font-bold text-[#0EA5E9]">
+          <CardTitle className="text-2xl font-bold main-primary">
             Libertá
           </CardTitle>
-          <p className="text-slate-600">Sistema de Atendimentos</p>
+          <p className="text-muted-foreground">Sistema de Atendimentos</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-700 font-medium">Email</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                type="text"
+                type="email"
                 placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="bg-white/50 border-white/20 focus:border-[#0EA5E9] focus:ring-[#0EA5E9]/20"
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-700 font-medium">Senha</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="********"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="bg-white/50 border-white/20 focus:border-[#0EA5E9] focus:ring-[#0EA5E9]/20"
+                required
               />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="rememberMe" 
-                checked={rememberMe} 
-                onCheckedChange={(checked) => setRememberMe(checked === true)}
-              />
-              <Label htmlFor="rememberMe" className="text-sm cursor-pointer text-slate-600">Lembrar-me</Label>
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white" 
+              className="w-full bg-main-primary hover:bg-main-primary-dark" 
               disabled={isLoading}
             >
               {isLoading ? "Entrando..." : "Entrar"}
@@ -116,9 +96,9 @@ const Login = () => {
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             Não tem uma conta?{" "}
-            <Link to="/register" className="text-[#0EA5E9] hover:underline">
+            <Link to="/register" className="main-primary hover:underline font-medium">
               Cadastre-se
             </Link>
           </p>
