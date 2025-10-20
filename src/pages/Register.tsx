@@ -43,7 +43,7 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      const success = await register(email, username, password);
+      const success = await register(username, email, password);
       
       if (success) {
         toast({

@@ -1,19 +1,21 @@
-
 import React, { createContext, useState, useContext, useEffect, useCallback, ReactNode } from 'react';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // Define user type
 interface User {
   id: string;
   email: string;
-  username: string;
+  name: string;
 }
 
 interface AuthContextType {
   currentUser: User | null;
   login: (email: string, password: string, rememberMe?: boolean) => Promise<boolean>;
-  register: (email: string, username: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  token: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,52 +35,49 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
 
-  // Load user from localStorage on mount
+  // Load user and token from localStorage on mount
   useEffect(() => {
+    const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
+    
+    if (storedToken && storedUser) {
       try {
+        setToken(storedToken);
         setCurrentUser(JSON.parse(storedUser));
         setIsAuthenticated(true);
       } catch (error) {
         console.error('Failed to parse stored user:', error);
+        localStorage.removeItem('token');
         localStorage.removeItem('currentUser');
       }
-    }
-    
-    // Adiciona o usuário administrador padrão se ele ainda não existir
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const adminExists = users.some((user: any) => user.email === 'adm');
-    
-    if (!adminExists) {
-      users.push({
-        id: 'admin-default',
-        email: 'adm',
-        username: 'Administrador',
-        password: '123'
-      });
-      localStorage.setItem('users', JSON.stringify(users));
     }
   }, []);
 
   // Login user
   const login = useCallback(async (email: string, password: string, rememberMe = false): Promise<boolean> => {
     try {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = users.find((user: any) => user.email === email && user.password === password);
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
       
-      if (user) {
-        const { password: _, ...userWithoutPassword } = user;
-        setCurrentUser(userWithoutPassword);
-        localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+      const data = await response.json();
+      
+      if (response.ok && data.token) {
+        setToken(data.token);
+        setCurrentUser(data.user);
         setIsAuthenticated(true);
         
-        // Salvar credenciais, se rememberMe for verdadeiro
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        
         if (rememberMe) {
-          localStorage.setItem('savedCredentials', JSON.stringify({ email, password }));
+          localStorage.setItem('rememberMe', 'true');
         } else {
-          localStorage.removeItem('savedCredentials');
+          localStorage.removeItem('rememberMe');
         }
         
         return true;
@@ -91,61 +90,42 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, []);
 
-  // Load saved credentials after login function is defined
-  useEffect(() => {
-    const savedCredentials = localStorage.getItem('savedCredentials');
-    if (savedCredentials) {
-      try {
-        const { email, password } = JSON.parse(savedCredentials);
-        login(email, password, true);
-      } catch (error) {
-        console.error('Failed to load saved credentials:', error);
-        localStorage.removeItem('savedCredentials');
-      }
-    }
-  }, [login]);
-
   // Register a new user
-  const register = async (email: string, username: string, password: string): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      // Check if user already exists
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const userExists = users.some((user: User) => user.email === email);
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
       
-      if (userExists) {
-        return false;
+      const data = await response.json();
+      
+      if (response.ok && data.token) {
+        setToken(data.token);
+        setCurrentUser(data.user);
+        setIsAuthenticated(true);
+        
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        
+        return true;
       }
       
-      // Create new user
-      const newUser = {
-        id: Date.now().toString(),
-        email,
-        username,
-      };
-      
-      // Store user in "database"
-      users.push({...newUser, password});
-      localStorage.setItem('users', JSON.stringify(users));
-      
-      // Set as current user
-      setCurrentUser(newUser);
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-      setIsAuthenticated(true);
-      
-      return true;
+      return false;
     } catch (error) {
       console.error('Registration error:', error);
       return false;
     }
   };
 
-
   // Logout user
   const logout = () => {
     setCurrentUser(null);
-    localStorage.removeItem('currentUser');
+    setToken(null);
     setIsAuthenticated(false);
-    // Não removemos savedCredentials aqui para manter a funcionalidade "lembrar-me"
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
   };
 
   const value = {
@@ -154,6 +134,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     register,
     logout,
     isAuthenticated,
+    token,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -29,8 +29,8 @@ const UserMenu = () => {
   if (!currentUser) return null;
 
   const getInitials = () => {
-    if (!currentUser.username) return 'U';
-    return currentUser.username
+    if (!currentUser.name) return 'U';
+    return currentUser.name
       .split(' ')
       .map(part => part[0])
       .join('')
@@ -56,7 +56,7 @@ const UserMenu = () => {
         <DropdownMenuLabel className="text-white">Minha Conta</DropdownMenuLabel>
         <DropdownMenuSeparator className="border-white/20" />
         <DropdownMenuItem disabled className="flex justify-between text-white/80">
-          <span className="text-sm">{currentUser.username}</span>
+          <span className="text-sm">{currentUser.name}</span>
           <UserIcon className="h-4 w-4" />
         </DropdownMenuItem>
         <DropdownMenuItem disabled className="text-xs text-white/60">

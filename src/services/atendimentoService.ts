@@ -42,7 +42,39 @@ interface AtendimentoData {
   } | null;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
+  };
+};
+
+// Background sync with API
+const syncWithAPI = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    const response = await fetch(`${API_URL}/api/atendimentos`, {
+      headers: getAuthHeaders()
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem("atendimentos", JSON.stringify(data));
+    }
+  } catch (error) {
+    console.error('Background sync failed:', error);
+  }
+};
+
 export const useAtendimentoService = () => {
+  // Sync in background on initialization
+  syncWithAPI();
+
   const getAtendimentos = (): AtendimentoData[] => {
     try {
       const data = localStorage.getItem("atendimentos");
@@ -60,6 +92,80 @@ export const useAtendimentoService = () => {
     }
   };
 
+  const createAtendimento = async (atendimento: AtendimentoData): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_URL}/api/atendimentos`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(atendimento)
+      });
+      
+      if (response.ok) {
+        // Update local cache
+        const atendimentos = getAtendimentos();
+        atendimentos.push(atendimento);
+        saveAtendimentos(atendimentos);
+        // Sync with API
+        await syncWithAPI();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error creating atendimento:', error);
+      return false;
+    }
+  };
+
+  const updateAtendimento = async (id: string, atendimento: AtendimentoData): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_URL}/api/atendimentos/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(atendimento)
+      });
+      
+      if (response.ok) {
+        // Update local cache
+        const atendimentos = getAtendimentos();
+        const index = atendimentos.findIndex(a => a.id === id);
+        if (index !== -1) {
+          atendimentos[index] = atendimento;
+          saveAtendimentos(atendimentos);
+        }
+        // Sync with API
+        await syncWithAPI();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error updating atendimento:', error);
+      return false;
+    }
+  };
+
+  const deleteAtendimento = async (id: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_URL}/api/atendimentos/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      
+      if (response.ok) {
+        // Update local cache
+        const atendimentos = getAtendimentos();
+        const filtered = atendimentos.filter(a => a.id !== id);
+        saveAtendimentos(filtered);
+        // Sync with API
+        await syncWithAPI();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error deleting atendimento:', error);
+      return false;
+    }
+  };
+
   const getClientsWithConsultations = () => {
     const atendimentos = getAtendimentos();
     return atendimentos.map(a => ({
@@ -72,6 +178,9 @@ export const useAtendimentoService = () => {
   return {
     getAtendimentos,
     saveAtendimentos,
+    createAtendimento,
+    updateAtendimento,
+    deleteAtendimento,
     getClientsWithConsultations,
   };
 };
