@@ -18,7 +18,10 @@ import RelatoriosFinanceirosTarot from "@/pages/RelatoriosFinanceirosTarot";
 import RelatoriosFrequenciaisTarot from "@/pages/RelatoriosFrequenciaisTarot";
 import RelatorioGeralTarot from "@/pages/RelatorioGeralTarot";
 import RelatorioIndividualTarot from "@/pages/RelatorioIndividualTarot";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,20 +43,22 @@ function App() {
         <Router>
           <div className="min-h-screen bg-background">
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/novo-atendimento" element={<NovoAtendimento />} />
-              <Route path="/editar-atendimento/:id" element={<EditarAtendimento />} />
-              <Route path="/relatorio-geral" element={<RelatorioGeral />} />
-              <Route path="/relatorio-geral-tarot" element={<RelatorioGeralTarot />} />
-              <Route path="/relatorio-individual" element={<RelatorioIndividual />} />
-              <Route path="/relatorio-individual-tarot" element={<RelatorioIndividualTarot />} />
-              <Route path="/analise-frequencial" element={<AnaliseFrequencial />} />
-              <Route path="/listagem-tarot" element={<ListagemTarot />} />
-              <Route path="/editar-analise-frequencial/:id" element={<EditarAnaliseFrequencial />} />
-              <Route path="/relatorios-frequencial" element={<RelatoriosFrequencial />} />
-              <Route path="/relatorios-financeiros" element={<RelatoriosFinanceiros />} />
-              <Route path="/relatorios-financeiros-tarot" element={<RelatoriosFinanceirosTarot />} />
-              <Route path="/relatorios-frequenciais-tarot" element={<RelatoriosFrequenciaisTarot />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/novo-atendimento" element={<ProtectedRoute><NovoAtendimento /></ProtectedRoute>} />
+              <Route path="/editar-atendimento/:id" element={<ProtectedRoute><EditarAtendimento /></ProtectedRoute>} />
+              <Route path="/relatorio-geral" element={<ProtectedRoute><RelatorioGeral /></ProtectedRoute>} />
+              <Route path="/relatorio-geral-tarot" element={<ProtectedRoute><RelatorioGeralTarot /></ProtectedRoute>} />
+              <Route path="/relatorio-individual" element={<ProtectedRoute><RelatorioIndividual /></ProtectedRoute>} />
+              <Route path="/relatorio-individual-tarot" element={<ProtectedRoute><RelatorioIndividualTarot /></ProtectedRoute>} />
+              <Route path="/analise-frequencial" element={<ProtectedRoute><AnaliseFrequencial /></ProtectedRoute>} />
+              <Route path="/listagem-tarot" element={<ProtectedRoute><ListagemTarot /></ProtectedRoute>} />
+              <Route path="/editar-analise-frequencial/:id" element={<ProtectedRoute><EditarAnaliseFrequencial /></ProtectedRoute>} />
+              <Route path="/relatorios-frequencial" element={<ProtectedRoute><RelatoriosFrequencial /></ProtectedRoute>} />
+              <Route path="/relatorios-financeiros" element={<ProtectedRoute><RelatoriosFinanceiros /></ProtectedRoute>} />
+              <Route path="/relatorios-financeiros-tarot" element={<ProtectedRoute><RelatoriosFinanceirosTarot /></ProtectedRoute>} />
+              <Route path="/relatorios-frequenciais-tarot" element={<ProtectedRoute><RelatoriosFrequenciaisTarot /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
