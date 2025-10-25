@@ -19,7 +19,6 @@ import RelatoriosFrequenciaisTarot from "@/pages/RelatoriosFrequenciaisTarot";
 import RelatorioGeralTarot from "@/pages/RelatorioGeralTarot";
 import RelatorioIndividualTarot from "@/pages/RelatorioIndividualTarot";
 import Login from "@/pages/Login";
-import Register from "@/pages/Register";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -44,7 +43,6 @@ function App() {
           <div className="min-h-screen bg-background">
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/novo-atendimento" element={<ProtectedRoute><NovoAtendimento /></ProtectedRoute>} />
               <Route path="/editar-atendimento/:id" element={<ProtectedRoute><EditarAtendimento /></ProtectedRoute>} />

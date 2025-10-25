@@ -32,8 +32,8 @@ const UserMenu = () => {
   if (!user) return null;
 
   const getInitials = () => {
-    if (!user.email) return 'U';
-    return user.email.charAt(0).toUpperCase();
+    if (!user.username) return 'U';
+    return user.username.charAt(0).toUpperCase();
   };
 
   return (
@@ -53,7 +53,7 @@ const UserMenu = () => {
       >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.email}</p>
+            <p className="text-sm font-medium leading-none">{user.username}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="border-white/20" />
