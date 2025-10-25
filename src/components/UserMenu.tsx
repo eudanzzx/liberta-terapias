@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { UserIcon, LogOut } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const UserMenu = () => {
@@ -39,9 +39,13 @@ const UserMenu = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200">
-          <Avatar className="h-8 w-8 border border-white/20">
-            <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-yellow-600 text-black text-xs font-semibold">
+        <Button 
+          variant="ghost" 
+          className="relative h-11 w-11 rounded-full hover:scale-105 transition-all duration-300 group"
+        >
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-main-primary to-main-primary-dark opacity-10 group-hover:opacity-20 transition-opacity" />
+          <Avatar className="h-11 w-11 border-2 border-main-primary shadow-lg">
+            <AvatarFallback className="bg-gradient-to-br from-main-primary to-main-primary-dark text-white text-base font-bold">
               {getInitials()}
             </AvatarFallback>
           </Avatar>
@@ -49,20 +53,29 @@ const UserMenu = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="end" 
-        className="w-48 bg-black/90 border border-white/20 backdrop-blur-md"
+        className="w-64 bg-white border border-border shadow-2xl rounded-xl p-2 animate-in fade-in slide-in-from-top-2 duration-200"
       >
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.username}</p>
+        <DropdownMenuLabel className="font-normal p-3">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-main-primary to-main-primary-dark flex items-center justify-center shadow-md">
+              <span className="text-white text-lg font-bold">{getInitials()}</span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <p className="text-base font-semibold text-foreground">{user.username}</p>
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <User className="h-3 w-3" />
+                Usuário
+              </p>
+            </div>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="border-white/20" />
+        <DropdownMenuSeparator className="my-2" />
         <DropdownMenuItem 
           onClick={handleLogout} 
-          className="text-red-400 focus:text-red-300 focus:bg-red-500/20 cursor-pointer"
+          className="cursor-pointer rounded-lg p-3 text-destructive hover:bg-destructive/10 focus:bg-destructive/10 transition-colors duration-200 group"
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Sair</span>
+          <LogOut className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
+          <span className="font-medium">Sair</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
