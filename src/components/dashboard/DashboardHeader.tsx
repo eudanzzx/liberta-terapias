@@ -10,6 +10,7 @@ import {
 import { Plus, Home, ChevronDown, Users, Menu, Bell, Sparkles } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "@/components/Logo";
+import UserMenu from "@/components/UserMenu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePaymentNotifications } from "@/components/tarot/payment-notifications/usePaymentNotifications";
 import TarotPriorityPaymentsModal from "@/components/TarotPriorityPaymentsModal";
@@ -114,6 +115,7 @@ const DashboardHeader = () => {
                   >
                     <Plus className="h-3 w-3" />
                   </Button>
+                  <UserMenu />
                 </div>
               ) : (
                 /* Menu desktop */
@@ -159,6 +161,7 @@ const DashboardHeader = () => {
                     <Plus className="h-4 w-4 mr-1" />
                     {isTarotPage ? 'Nova Análise' : 'Novo Atendimento'}
                   </Button>
+                  <UserMenu />
                 </>
               )}
             </div>
